@@ -37,8 +37,8 @@ export default function SiteHeader({
       {isLoggedIn && currentScreen === 'upload' && (
         <nav className="hidden md:flex space-x-2 bg-zinc-900/80 p-1.5 rounded-xl border border-zinc-800 text-xs">
           <button
-            onClick={() => setActiveTab('upload')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'upload' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            onClick={() => setActiveTab('home')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'home' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
             Profil
           </button>
