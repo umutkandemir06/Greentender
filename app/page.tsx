@@ -15,19 +15,6 @@ import SettingsPanel from '@/components/settings-panel'
 import HelpModal from '@/components/help-modal'
 import PricingModal from '@/components/pricing-modal'
 
-export interface AnalysisReport {
-  title?: string
-  institution?: string
-  budget?: string
-  penalties?: string
-  risks?: string[]
-  documents?: string[]
-  winRate?: number
-  fixes?: string[]
-  summary?: string
-  [key: string]: any
-}
-
 export interface CompanyProfile {
   companyName: string
   mainSector: string
@@ -50,7 +37,7 @@ export default function Page() {
     targetBudget: '₺50.000.000'
   })
   
-  const [analysisReport, setAnalysisReport] = useState<any | null>(null)
+  const [analysisReport, setAnalysisReport] = useState<any>(null)
   const [historyItems, setHistoryItems] = useState<any[]>([])
   const [isHelpOpen, setIsHelpOpen] = useState(false)
   const [isPricingOpen, setIsPricingOpen] = useState(false)
