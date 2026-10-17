@@ -11,19 +11,16 @@ interface AuthScreenProps {
 export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: AuthScreenProps) {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode)
   
-  // Kayıt ol alanları
   const [companyName, setCompanyName] = useState('')
   const [vkn, setVkn] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   
-  // Sektör seçim alanları
   const [mainSector, setMainSector] = useState('Yapim')
   const [subSector, setSubSector] = useState('Insaat_Bina')
 
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Ana sektöre bağlı yan sektör seçenekleri
   const sectorOptions: Record<string, { label: string; value: string }[]> = {
     Yapim: [
       { label: 'İnşaat / Bina Yapım İşleri', value: 'Insaat_Bina' },
@@ -42,10 +39,30 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
     ]
   }
 
+  const validateVKN = (vknStr: string): boolean => {
+    if (!/^\d{10}$/.test(vknStr)) return false;
+    
+    const digits = vknStr.split('').map(Number);
+    let total = 0;
+
+    for (let i = 0; i < 9; i++) {
+      const tmp = (digits[i] + (9 - i)) % 10;
+      let res = (tmp * Math.pow(2, 9 - i)) % 9;
+      if (tmp !== 0 && res === 0) {
+        res = 9;
+      }
+      total += res;
+    }
+
+    const lastDigit = digits[9];
+    const calculatedCheck = (10 - (total % 10)) % 10;
+
+    return lastDigit === calculatedCheck;
+  }
+
   const handleMainSectorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newMain = e.target.value
     setMainSector(newMain)
-    // Ana sektör değiştiğinde ilk yan sektörü varsayılan seç
     if (sectorOptions[newMain] && sectorOptions[newMain].length > 0) {
       setSubSector(sectorOptions[newMain][0].value)
     }
@@ -63,25 +80,29 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
         return
       }
 
+      if (vkn.length !== 10) {
+        setErrorMsg('Vergi Kimlik Numarası (VKN) tam 10 haneli olmalıdır.')
+        return
+      }
+
+      if (!validateVKN(vkn)) {
+        setErrorMsg('Girilen VKN matematiksel olarak geçersizdir. Lütfen gerçek bir VKN giriniz.')
+        return
+      }
+
       const existingUser = storedUsers.find((u: any) => u.email === email)
       if (existingUser) {
         setErrorMsg('Bu e-posta adresi ile daha önce kayıt olunmuş.')
         return
       }
 
-      if (vkn.length !== 10) {
-        setErrorMsg('VKN (Vergi Kimlik Numarası) 10 haneli olmalıdır.')
-        return
-      }
-
-      // Şirket kaydı (sektör bilgileriyle birlikte)
       const newUser = { companyName, vkn, email, password, mainSector, subSector }
       storedUsers.push(newUser)
       localStorage.setItem('greentender_users', JSON.stringify(storedUsers))
       localStorage.setItem('greentender_current_user', companyName)
       localStorage.setItem('greentender_company_profile', JSON.stringify({ companyName, mainSector, sector: subSector }))
 
-      alert('Şirket kaydı ve sektörel tanımlar başarıyla oluşturuldu! Giriş yapılıyor...')
+      alert('Şirket kaydı ve VKN doğrulaması başarıyla tamamlandı! Giriş yapılıyor...')
       onSuccess(companyName)
     } else {
       if (!email || !password) {
@@ -157,19 +178,18 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
 
               <div>
                 <label className="block text-xs font-medium text-emerald-400 mb-1.5">
-                  VKN Numarası (Vergi Kimlik No):
+                  VKN Numarası (10 Hane):
                 </label>
                 <input
                   type="text"
                   maxLength={10}
                   value={vkn}
                   onChange={(e) => setVkn(e.target.value)}
-                  placeholder="10 haneli VKN giriniz"
+                  placeholder="Örn: 1000036109"
                   className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-xs"
                 />
               </div>
 
-              {/* Ana Sektör Seçimi */}
               <div>
                 <label className="block text-xs font-medium text-emerald-400 mb-1.5">
                   Ana Sektör:
@@ -185,7 +205,6 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
                 </select>
               </div>
 
-              {/* Yan Sektör Seçimi */}
               <div>
                 <label className="block text-xs font-medium text-emerald-400 mb-1.5">
                   Yan Sektör / Uzmanlık Alanı:
@@ -210,7 +229,7 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
               Kurumsal E-posta:
             </label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="sirketadi@sirket.com"
