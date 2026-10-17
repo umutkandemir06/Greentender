@@ -16,7 +16,40 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
   const [vkn, setVkn] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  
+  // Sektör seçim alanları
+  const [mainSector, setMainSector] = useState('Yapim')
+  const [subSector, setSubSector] = useState('Insaat_Bina')
+
   const [errorMsg, setErrorMsg] = useState('')
+
+  // Ana sektöre bağlı yan sektör seçenekleri
+  const sectorOptions: Record<string, { label: string; value: string }[]> = {
+    Yapim: [
+      { label: 'İnşaat / Bina Yapım İşleri', value: 'Insaat_Bina' },
+      { label: 'Yol, Köprü ve Altyapı İşleri', value: 'Altyapi_Yol' },
+      { label: 'Elektrik ve Mekanik Tesisat İşleri', value: 'Tesisat' }
+    ],
+    Hizmet: [
+      { label: 'Bilgi İşlem ve Yazılım Hizmetleri', value: 'Yazilim_IT' },
+      { label: 'Temizlik ve Güvenlik Hizmetleri', value: 'Temizlik_Guvenlik' },
+      { label: 'Danışmanlık ve Mühendislik Hizmetleri', value: 'Danismanlik' }
+    ],
+    MalAlimi: [
+      { label: 'Tıbbi Cihaz ve Sarf Malzemeleri', value: 'Tibbi_Malzeme' },
+      { label: 'Büro ve Kırtasiye Malzemeleri', value: 'Kirtasiye' },
+      { label: 'Gıda ve İaşeli Mal Alımları', value: 'Gida' }
+    ]
+  }
+
+  const handleMainSectorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newMain = e.target.value
+    setMainSector(newMain)
+    // Ana sektör değiştiğinde ilk yan sektörü varsayılan seç
+    if (sectorOptions[newMain] && sectorOptions[newMain].length > 0) {
+      setSubSector(sectorOptions[newMain][0].value)
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,34 +58,32 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
     const storedUsers = JSON.parse(localStorage.getItem('greentender_users') || '[]')
 
     if (mode === 'register') {
-      if (!companyName || !vkn || !email || !password) {
-        setErrorMsg('Lütfen tüm kurumsal bilgileri eksiksiz doldurun.')
+      if (!companyName || !vkn || !email || !password || !mainSector || !subSector) {
+        setErrorMsg('Lütfen tüm kurumsal ve sektörel bilgileri eksiksiz doldurun.')
         return
       }
 
-      // E-posta formatı veya daha önce kayıtlı olup olmadığını kontrol et
       const existingUser = storedUsers.find((u: any) => u.email === email)
       if (existingUser) {
         setErrorMsg('Bu e-posta adresi ile daha önce kayıt olunmuş.')
         return
       }
 
-      // VKN uzunluk kontrolü (Örn: 10 hane)
       if (vkn.length !== 10) {
         setErrorMsg('VKN (Vergi Kimlik Numarası) 10 haneli olmalıdır.')
         return
       }
 
-      // Yeni kullanıcıyı kaydet
-      const newUser = { companyName, vkn, email, password }
+      // Şirket kaydı (sektör bilgileriyle birlikte)
+      const newUser = { companyName, vkn, email, password, mainSector, subSector }
       storedUsers.push(newUser)
       localStorage.setItem('greentender_users', JSON.stringify(storedUsers))
       localStorage.setItem('greentender_current_user', companyName)
+      localStorage.setItem('greentender_company_profile', JSON.stringify({ companyName, mainSector, sector: subSector }))
 
-      alert('Şirket kaydı başarıyla oluşturuldu! Giriş yapılıyor...')
+      alert('Şirket kaydı ve sektörel tanımlar başarıyla oluşturuldu! Giriş yapılıyor...')
       onSuccess(companyName)
     } else {
-      // Giriş yapma kontrolü (E-posta ve Şifre ile)
       if (!email || !password) {
         setErrorMsg('Lütfen e-posta ve şifrenizi girin.')
         return
@@ -64,6 +95,11 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
 
       if (foundUser) {
         localStorage.setItem('greentender_current_user', foundUser.companyName)
+        localStorage.setItem('greentender_company_profile', JSON.stringify({ 
+          companyName: foundUser.companyName, 
+          mainSector: foundUser.mainSector, 
+          sector: foundUser.subSector 
+        }))
         onSuccess(foundUser.companyName)
       } else {
         setErrorMsg('E-posta veya şifre hatalı ya da böyle bir şirket kaydı bulunamadı.')
@@ -131,6 +167,40 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
                   placeholder="10 haneli VKN giriniz"
                   className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-xs"
                 />
+              </div>
+
+              {/* Ana Sektör Seçimi */}
+              <div>
+                <label className="block text-xs font-medium text-emerald-400 mb-1.5">
+                  Ana Sektör:
+                </label>
+                <select
+                  value={mainSector}
+                  onChange={handleMainSectorChange}
+                  className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors text-xs"
+                >
+                  <option value="Yapim">Yapım İşleri</option>
+                  <option value="Hizmet">Hizmet Alımları</option>
+                  <option value="MalAlimi">Mal Alımları</option>
+                </select>
+              </div>
+
+              {/* Yan Sektör Seçimi */}
+              <div>
+                <label className="block text-xs font-medium text-emerald-400 mb-1.5">
+                  Yan Sektör / Uzmanlık Alanı:
+                </label>
+                <select
+                  value={subSector}
+                  onChange={(e) => setSubSector(e.target.value)}
+                  className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors text-xs"
+                >
+                  {sectorOptions[mainSector]?.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
