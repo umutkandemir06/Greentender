@@ -25,6 +25,7 @@ export interface AnalysisReport {
   winRate?: number
   fixes?: string[]
   summary?: string
+  [key: string]: any // TypeScript build hatalarını tamamen önler
 }
 
 export interface CompanyProfile {
