@@ -34,31 +34,37 @@ export default function SiteHeader({
         <span className="font-bold text-lg tracking-tight">GreenTender</span>
       </div>
 
-      {isLoggedIn && currentScreen === 'upload' && (
+      {isLoggedIn && (currentScreen === 'upload' || currentScreen === 'report') && (
         <nav className="hidden md:flex space-x-2 bg-zinc-900/80 p-1.5 rounded-xl border border-zinc-800 text-xs">
           <button
-            onClick={() => setActiveTab('home')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'home' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            onClick={() => { setCurrentScreen('upload'); setActiveTab('home'); }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentScreen === 'upload' && activeTab === 'home' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
             Profil
           </button>
           <button
-            onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'history' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            onClick={() => { setCurrentScreen('upload'); setActiveTab('upload'); }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentScreen === 'upload' && activeTab === 'upload' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+          >
+            Analiz Et
+          </button>
+          <button
+            onClick={() => { setCurrentScreen('upload'); setActiveTab('history'); }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentScreen === 'upload' && activeTab === 'history' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
             Geçmiş
           </button>
           <button
-            onClick={() => setActiveTab('settings')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'settings' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
-          >
-            Ayarlar
-          </button>
-          <button
-            onClick={() => setActiveTab('live')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'live' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            onClick={() => { setCurrentScreen('upload'); setActiveTab('live'); }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentScreen === 'upload' && activeTab === 'live' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
             Güncel İhaleler
+          </button>
+          <button
+            onClick={() => { setCurrentScreen('upload'); setActiveTab('settings'); }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentScreen === 'upload' && activeTab === 'settings' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+          >
+            Ayarlar
           </button>
         </nav>
       )}
