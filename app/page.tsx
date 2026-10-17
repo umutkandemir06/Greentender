@@ -6,6 +6,7 @@ import LandingHero from '@/components/landing-hero'
 import LandingFeatures from '@/components/landing-features'
 import LandingFooter from '@/components/landing-footer'
 import AuthScreen from '@/components/auth-screen'
+import DashboardShell from '@/components/dashboard-shell'
 import UploadScreen from '@/components/upload-screen'
 import AnalysisLoading from '@/components/analysis-loading'
 import ReportDashboard from '@/components/report-dashboard'
@@ -25,7 +26,7 @@ export interface CompanyProfile {
 
 export default function Page() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'auth' | 'upload' | 'analyzing' | 'report'>('landing')
-  const [activeTab, setActiveTab] = useState<'upload' | 'history' | 'live' | 'settings'>('upload')
+  const [activeTab, setActiveTab] = useState<'home' | 'upload' | 'history' | 'live' | 'settings'>('home')
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState('Umut Kandemir')
@@ -95,6 +96,7 @@ export default function Page() {
     } catch (err: any) {
       alert('Hata: ' + err.message)
       setCurrentScreen('upload')
+      setActiveTab('upload')
     }
   }, [companyProfile, historyItems])
 
@@ -105,7 +107,7 @@ export default function Page() {
         userName={userName}
         onLoginClick={() => { setAuthMode('login'); setCurrentScreen('auth'); }}
         onRegisterClick={() => { setAuthMode('register'); setCurrentScreen('auth'); }}
-        onLogout={() => { setIsLoggedIn(false); setCurrentScreen('landing'); }}
+        onLogout={() => { setIsLoggedIn(false); setCurrentScreen('landing'); setActiveTab('home'); }}
         onOpenHelp={() => setIsHelpOpen(true)}
         onOpenPricing={() => setIsPricingOpen(true)}
         activeTab={activeTab}
@@ -121,6 +123,7 @@ export default function Page() {
               onStartClick={() => {
                 if (isLoggedIn) {
                   setCurrentScreen('upload')
+                  setActiveTab('home')
                 } else {
                   setAuthMode('login')
                   setCurrentScreen('auth')
@@ -139,6 +142,7 @@ export default function Page() {
               setUserName(name || 'Umut Kandemir')
               setIsLoggedIn(true)
               setCurrentScreen('upload')
+              setActiveTab('home')
             }}
             onBack={() => setCurrentScreen('landing')}
           />
@@ -146,6 +150,13 @@ export default function Page() {
 
         {currentScreen === 'upload' && (
           <div className="flex-1 flex flex-col">
+            {activeTab === 'home' && (
+              <DashboardShell
+                userName={userName}
+                onStartAnalysisClick={() => setActiveTab('upload')}
+                onHistoryClick={() => setActiveTab('history')}
+              />
+            )}
             {activeTab === 'upload' && (
               <UploadScreen
                 companyProfile={companyProfile}
@@ -184,7 +195,7 @@ export default function Page() {
           <ReportDashboard
             report={analysisReport}
             companyProfile={companyProfile}
-            onNewAnalysis={() => setCurrentScreen('upload')}
+            onNewAnalysis={() => { setCurrentScreen('upload'); setActiveTab('upload'); }}
           />
         )}
       </main>

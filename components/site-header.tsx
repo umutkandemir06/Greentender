@@ -34,36 +34,31 @@ export default function SiteHeader({
         <span className="font-bold text-lg tracking-tight">GreenTender</span>
       </div>
 
-      <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-zinc-300">
-        <button onClick={() => setCurrentScreen('landing')} className="hover:text-white transition-colors">Özellikler</button>
-        <button onClick={onOpenPricing} className="hover:text-white transition-colors">Üyelik</button>
-      </div>
-
       {isLoggedIn && currentScreen === 'upload' && (
-        <nav className="hidden md:flex space-x-1 bg-zinc-900 p-1 rounded-xl border border-zinc-800 text-xs">
+        <nav className="hidden md:flex space-x-2 bg-zinc-900/80 p-1.5 rounded-xl border border-zinc-800 text-xs">
           <button
             onClick={() => setActiveTab('upload')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'upload' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
-            Yeni Analiz
+            Profil
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'history' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
-            Geçmiş Raporlar
-          </button>
-          <button
-            onClick={() => setActiveTab('live')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'live' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
-          >
-            Canlı İhaleler
+            Geçmiş
           </button>
           <button
             onClick={() => setActiveTab('settings')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'settings' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
-            Firma Ayarları
+            Ayarlar
+          </button>
+          <button
+            onClick={() => setActiveTab('live')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'live' ? 'bg-emerald-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+          >
+            Güncel İhaleler
           </button>
         </nav>
       )}
@@ -74,7 +69,7 @@ export default function SiteHeader({
         {isLoggedIn ? (
           <div className="flex items-center space-x-3 border-l border-zinc-800 pl-4">
             <span className="text-xs text-zinc-300 font-medium">{userName}</span>
-            <button onClick={onLogout} className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs px-3 py-1.5 rounded-lg">Çıkış</button>
+            <button onClick={onLogout} className="text-xs text-red-400 hover:text-red-300 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg transition-colors">Çıkış</button>
           </div>
         ) : (
           <div className="flex items-center space-x-2">
