@@ -50,7 +50,6 @@ export default function Page() {
     targetBudget: '₺50.000.000'
   })
   
-  // State tipi any yapılarak tüm tip uyuşmazlığı hataları kesin olarak önlendi
   const [analysisReport, setAnalysisReport] = useState<any | null>(null)
   const [historyItems, setHistoryItems] = useState<any[]>([])
   const [isHelpOpen, setIsHelpOpen] = useState(false)
@@ -189,3 +188,22 @@ export default function Page() {
             )}
           </div>
         )}
+
+        {currentScreen === 'analyzing' && (
+          <AnalysisLoading />
+        )}
+
+        {currentScreen === 'report' && analysisReport && (
+          <ReportDashboard
+            report={analysisReport}
+            companyProfile={companyProfile}
+            onNewAnalysis={() => setCurrentScreen('upload')}
+          />
+        )}
+      </main>
+
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <PricingModal isOpen={isPricingOpen} onClose={() => setIsPricingOpen(false)} />
+    </div>
+  )
+}
