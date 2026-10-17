@@ -34,6 +34,11 @@ export default function SiteHeader({
         <span className="font-bold text-lg tracking-tight">GreenTender</span>
       </div>
 
+      <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-zinc-300">
+        <button onClick={() => setCurrentScreen('landing')} className="hover:text-white transition-colors">Özellikler</button>
+        <button onClick={onOpenPricing} className="hover:text-white transition-colors">Üyelik</button>
+      </div>
+
       {isLoggedIn && currentScreen === 'upload' && (
         <nav className="hidden md:flex space-x-1 bg-zinc-900 p-1 rounded-xl border border-zinc-800 text-xs">
           <button
@@ -65,7 +70,6 @@ export default function SiteHeader({
 
       <div className="flex items-center space-x-3">
         <button onClick={onOpenHelp} className="text-xs text-zinc-400 hover:text-white px-3 py-2">Yardım</button>
-        <button onClick={onOpenPricing} className="text-xs text-zinc-400 hover:text-white px-3 py-2">Fiyatlar</button>
 
         {isLoggedIn ? (
           <div className="flex items-center space-x-3 border-l border-zinc-800 pl-4">
@@ -74,8 +78,12 @@ export default function SiteHeader({
           </div>
         ) : (
           <div className="flex items-center space-x-2">
-            <button onClick={onLoginClick} className="text-xs px-3 py-2 text-zinc-300 hover:text-white font-medium">Giriş Yap</button>
-            <button onClick={onRegisterClick} className="bg-emerald-600 hover:bg-emerald-500 text-xs px-4 py-2 rounded-xl font-medium shadow-lg shadow-emerald-900/20">Kayıt Ol</button>
+            <button
+              onClick={onLoginClick}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs md:text-sm px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-emerald-900/20 transition-all"
+            >
+              Giriş Yap
+            </button>
           </div>
         )}
       </div>
