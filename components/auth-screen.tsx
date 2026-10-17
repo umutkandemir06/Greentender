@@ -10,8 +10,11 @@ interface AuthScreenProps {
 
 export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: AuthScreenProps) {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode)
-  const [name, setName] = useState('')
-  const [username, setUsername] = useState('')
+  
+  // Kayıt ol alanları
+  const [companyName, setCompanyName] = useState('')
+  const [vkn, setVkn] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -22,44 +25,48 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
     const storedUsers = JSON.parse(localStorage.getItem('greentender_users') || '[]')
 
     if (mode === 'register') {
-      if (!username || !password || !name) {
-        setErrorMsg('Lütfen tüm alanları doldurun.')
+      if (!companyName || !vkn || !email || !password) {
+        setErrorMsg('Lütfen tüm kurumsal bilgileri eksiksiz doldurun.')
         return
       }
 
-      // Kullanıcı adı daha önce alınmış mı kontrol et
-      const existingUser = storedUsers.find((u: any) => u.username === username)
+      // E-posta formatı veya daha önce kayıtlı olup olmadığını kontrol et
+      const existingUser = storedUsers.find((u: any) => u.email === email)
       if (existingUser) {
-        setErrorMsg('Bu kullanıcı adı zaten alınmış. Lütfen başka bir tane seçin.')
+        setErrorMsg('Bu e-posta adresi ile daha önce kayıt olunmuş.')
+        return
+      }
+
+      // VKN uzunluk kontrolü (Örn: 10 hane)
+      if (vkn.length !== 10) {
+        setErrorMsg('VKN (Vergi Kimlik Numarası) 10 haneli olmalıdır.')
         return
       }
 
       // Yeni kullanıcıyı kaydet
-      const newUser = { name, username, password }
+      const newUser = { companyName, vkn, email, password }
       storedUsers.push(newUser)
       localStorage.setItem('greentender_users', JSON.stringify(storedUsers))
-      localStorage.setItem('greentender_current_user', name)
+      localStorage.setItem('greentender_current_user', companyName)
 
-      alert('Kayıt başarıyla oluşturuldu! Giriş yapılıyor...')
-      onSuccess(name)
+      alert('Şirket kaydı başarıyla oluşturuldu! Giriş yapılıyor...')
+      onSuccess(companyName)
     } else {
-      // Giriş yapma kontrolü
-      if (!username || !password) {
-        setErrorMsg('Lütfen kullanıcı adı ve şifrenizi girin.')
+      // Giriş yapma kontrolü (E-posta ve Şifre ile)
+      if (!email || !password) {
+        setErrorMsg('Lütfen e-posta ve şifrenizi girin.')
         return
       }
 
-      // Kayıtlı kullanıcılar arasında ara
       const foundUser = storedUsers.find(
-        (u: any) => u.username === username && u.password === password
+        (u: any) => u.email === email && u.password === password
       )
 
       if (foundUser) {
-        localStorage.setItem('greentender_current_user', foundUser.name)
-        onSuccess(foundUser.name)
+        localStorage.setItem('greentender_current_user', foundUser.companyName)
+        onSuccess(foundUser.companyName)
       } else {
-        // Eğer daha önce kayıt olmamışsa ama test için varsayılan bir kullanıcı kabul edilsin istenmiyorsa hata verelim
-        setErrorMsg('Kullanıcı adı veya şifre hatalı ya da böyle bir kayıt bulunamadı. Lütfen önce Kayıt Olun.')
+        setErrorMsg('E-posta veya şifre hatalı ya da böyle bir şirket kaydı bulunamadı.')
       }
     }
   }
@@ -70,7 +77,7 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
         
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-emerald-400 tracking-wider uppercase text-left">
-            {mode === 'login' ? 'GİRİŞ YAP' : 'KAYIT OL'}
+            {mode === 'login' ? 'GİRİŞ YAP' : 'ŞİRKET KAYDI'}
           </h2>
           <div className="flex space-x-2 text-xs">
             <button
@@ -96,37 +103,54 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
-            <div>
-              <label className="block text-xs font-medium text-emerald-400 mb-2">
-                Ad Soyad:
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Adınızı girin"
-                className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-sm"
-              />
-            </div>
+            <>
+              <div>
+                <label className="block text-xs font-medium text-emerald-400 mb-1.5">
+                  Şirket Adı:
+                </label>
+                <input
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  placeholder="Örn: GreenTender A.Ş."
+                  className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-emerald-400 mb-1.5">
+                  VKN Numarası (Vergi Kimlik No):
+                </label>
+                <input
+                  type="text"
+                  maxLength={10}
+                  value={vkn}
+                  onChange={(e) => setVkn(e.target.value)}
+                  placeholder="10 haneli VKN giriniz"
+                  className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-xs"
+                />
+              </div>
+            </>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-emerald-400 mb-2">
-              Kullanıcı Adı:
+            <label className="block text-xs font-medium text-emerald-400 mb-1.5">
+              Kurumsal E-posta:
             </label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Kullanıcı adınızı girin"
-              className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-sm"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="sirketadi@sirket.com"
+              className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-xs"
+              required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-emerald-400 mb-2">
+            <label className="block text-xs font-medium text-emerald-400 mb-1.5">
               Şifre:
             </label>
             <input
@@ -134,21 +158,22 @@ export default function AuthScreen({ mode: initialMode, onSuccess, onBack }: Aut
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-sm"
+              className="w-full bg-[#121216] border border-emerald-500/40 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-600 text-xs"
+              required
             />
           </div>
 
-          <div className="pt-2">
+          <div className="pt-3">
             <button
               type="submit"
-              className="w-full bg-[#00e676] hover:bg-[#00c853] text-zinc-950 font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 text-center tracking-wide text-sm"
+              className="w-full bg-[#00e676] hover:bg-[#00c853] text-zinc-950 font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/20 text-center tracking-wide text-xs"
             >
               {mode === 'login' ? 'ONAYLA' : 'HESAP OLUŞTUR'}
             </button>
           </div>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-5 text-center">
           <button
             onClick={onBack}
             className="text-xs text-zinc-400 hover:text-white transition-colors"
