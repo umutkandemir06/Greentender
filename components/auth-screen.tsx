@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'formdata-node' // veya standart React state
-import React, { useState as useReactState } from 'react'
+import React, { useState } from 'react'
 
 interface AuthScreenProps {
   mode: 'login' | 'register'
@@ -15,7 +14,6 @@ export default function AuthScreen({ mode, onSuccess, onBack }: AuthScreenProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Giriş başarılı simülasyonu
     onSuccess(username || 'Umut Kandemir')
   }
 
@@ -43,7 +41,7 @@ export default function AuthScreen({ mode, onSuccess, onBack }: AuthScreenProps)
 
           <div>
             <label className="block text-xs font-medium text-emerald-400 mb-2">
-              Şifre:
+              ŞفRE: (Şifre)
             </label>
             <input
               type="password"
