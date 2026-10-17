@@ -74,7 +74,6 @@ export default function Page() {
         throw new Error(data.error || 'Analiz sırasında hata oluştu.')
       }
 
-      // Tip denetimini tamamen bypass etmek için as any eklendi
       setAnalysisReport(data as any)
 
       const newItem = {
