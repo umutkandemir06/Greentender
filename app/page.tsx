@@ -54,7 +54,6 @@ export default function Page() {
   const [isHelpOpen, setIsHelpOpen] = useState(false)
   const [isPricingOpen, setIsPricingOpen] = useState(false)
 
-  // Geçmiş raporları localStorage'dan yükle
   useEffect(() => {
     const savedHistory = localStorage.getItem('greentender_history')
     if (savedHistory) {
@@ -89,7 +88,6 @@ export default function Page() {
 
       setAnalysisReport(data)
 
-      // Geçmişe ekle
       const newItem = {
         id: Date.now().toString(),
         title: data.title || file.name,
@@ -207,3 +205,4 @@ export default function Page() {
       <PricingModal isOpen={isPricingOpen} onClose={() => setIsPricingOpen(false)} />
     </div>
   )
+}
